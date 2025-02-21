@@ -66,11 +66,11 @@ function getServiceUpdateOptions(referringItemFieldName, referringItemId, refere
   };
 
 async function updateService(fieldName,service_id,blog_ref_id,service){
-//    console.log("Updating",service.data.title)
-    const serviceUpdateOptions = getServiceUpdateOptions(fieldName,service_id,"67b25628ac23e3addd713c82",service)
+    console.log("Updating",service.data.title)
+    const serviceUpdateOptions = getServiceUpdateOptions(fieldName,service_id,blog_ref_id,service)
     return axios(serviceUpdateOptions)
     .then(results => {
-//      console.log("Update Service Results",results.status)
+      console.log("Update Service Results",results.status)
     })
     .catch(error =>{console.error("ERROR",error.status,error.response.data,serviceUpdateOptions)})
 }
@@ -154,21 +154,21 @@ async function getService(date) {
 //
 axios(blogQueryOptions)
   .then(function (response) {
-//    console.log(`Found ${response.data.posts.length} Candidate Blog Entries`);
+console.log(`Found ${response.data.posts.length} Candidate Blog Entries`);
     response.data.posts.forEach((post)=>{ 
-//      console.log("Matching Blog DB Entry",post.title)
+      console.log("Matching Blog DB Entry",post.title)
       const blogUpdateOptions = getBlogUpdateOptions(post.id)
       const postDate = new Date((new Date(post.createdDate)).setHours(0,0,0,0));    
       const isOverEightDaysOld = (postDate.getMilliseconds() < EightDaysAgo.getMilliseconds()); 
       var blogChanged = (post.featured && (!isOverEightDaysOld));
       blogUpdateOptions.data.draftPost.featured = ((blogUpdateOptions.data.draftPost.featured) && (!isOverEightDaysOld));
-      //console.log("Blog is featured and old",blogChanged,post.featured, isOverEightDaysOld);
+      console.log("Blog is featured and old",blogChanged,post.featured, isOverEightDaysOld);
       const hasOOSWordsInTitle = oosWords.some(s => post.title.toLowerCase().includes(s));
       const hasSermonWordsInTitle = sermonWords.some(s => post.title.toLowerCase().includes(s));
       const isCommentable = post.tagIds.includes(commentableTagId);
       blogChanged = (blogChanged || (!isCommentable && post.commentingEnabled));
       blogUpdateOptions.data.draftPost.commentingEnabled = isCommentable;
-//      console.log("Blog changes due to commenting enabled",blogChanged,(!isCommentable && post.commentingEnabled))
+      console.log("Blog changes due to commenting enabled",blogChanged,(!isCommentable && post.commentingEnabled))
 
       const title = post.title;
       const date = new Date(extractDate(post.title)).toISOString().substring(0,10);
@@ -191,26 +191,26 @@ axios(blogQueryOptions)
             console.log("why was the service null?");
             return;
           }
-//          console.log(" Matching Service?",service?.data.title || `Not Found ${service}`);
+          console.log(" Matching Service?",service?.data.title || `Not Found ${service}`);
           
           if (hasSermonWordsInTitle){
             blogUpdateOptions.data.draftPost.categoryIds = [sermonCategoryID];
             blogChanged = true;
-//            console.log("Blog changed because sermon found",blogChanged)
+            console.log("Blog changed because sermon found",blogChanged)
             updateService("sermon",service.id, internalBlogID, service); // post.id
           } 
 
           if (hasOOSWordsInTitle){
             blogUpdateOptions.data.draftPost.categoryIds = [oosCategoryID];
             blogChanged = true;
-//            console.log("Blog changed because OOS found",blogChanged)
+            console.log("Blog changed because OOS found",blogChanged)
             updateService("document",service.id, internalBlogID, service); // post.id
           } 
-//          console.log("Blog Changes?",(blogChanged?"Yes":"No"),((allowUpdates?"Updating":"Not updating"),post.id));//,JSON.stringify(post,null,'\t')));        
+          console.log("Blog Changes?",(blogChanged?"Yes":"No"),((allowUpdates?"Updating":"Not updating"),post.id));//,JSON.stringify(post,null,'\t')));        
           if (allowUpdates && blogChanged) { // this is just a way to turn this section on or off when debugging
             axios(blogUpdateOptions)
             .then(function (response) {
-//                console.log("update post",response.data.draftPost.title,"status",response.status);
+                console.log("update post",response.data.draftPost.title,"status",response.status);
             })
             .catch(function (error) {
               console.log("updated blog error",error);
